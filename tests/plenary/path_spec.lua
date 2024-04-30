@@ -316,6 +316,19 @@ describe("Path", function()
       assert(not p:exists())
     end)
 
+    it("can create and delete directories with parenthesis", function()
+      local p = Path:new "(_dir_not_exist)"
+
+      p:rmdir()
+      assert(not p:exists(), "After rmdir, it should not exist")
+
+      p:mkdir()
+      assert(p:exists())
+
+      p:rmdir()
+      assert(not p:exists())
+    end)
+
     it("fails when exists_ok is false", function()
       local p = Path:new "lua"
       assert(not pcall(p.mkdir, p, { exists_ok = false }))
@@ -329,6 +342,17 @@ describe("Path", function()
 
     it("can create nested directories", function()
       local p = Path:new("impossible", "dir")
+      assert(pcall(p.mkdir, p, { parents = true }))
+      assert(p:exists())
+
+      p:rmdir()
+      Path:new("impossible"):rmdir()
+      assert(not p:exists())
+      assert(not Path:new("impossible"):exists())
+    end)
+
+    it("can create nested directories with parenthesis", function()
+      local p = Path:new("impossible", "(dir)")
       assert(pcall(p.mkdir, p, { parents = true }))
       assert(p:exists())
 
